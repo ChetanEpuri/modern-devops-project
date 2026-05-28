@@ -1,3 +1,29 @@
+# ==========================================
+# SECURITY: KEY GENERATOR BLOCK
+# ==========================================
+
+# 1. Generate a secure RSA Private Key automatically
+resource "tls_private_key" "rsa_key" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+# 2. Upload the Public Key component to AWS
+resource "aws_key_pair" "app_key" {
+  key_name   = "${var.project_name}-key"
+  public_key = tls_private_key.rsa_key.public_key_openssh
+}
+
+# 3. Save the private key locally as ec2-key.pem
+resource "local_file" "pem_file" {
+  content  = tls_private_key.rsa_key.private_key_pem
+  filename = "${path.module}/ec2-key.pem"
+}
+
+# ==========================================
+# INFRASTRUCTURE NETWORKING LOGIC
+# ==========================================
+
 # VPC
 resource "aws_vpc" "main" {
   cidr_block           = "10.0.0.0/16"
@@ -96,9 +122,12 @@ resource "aws_security_group" "app" {
 # EC2 Instance
 resource "aws_instance" "app" {
   ami                    = "ami-0f58b397bc5c1f2e8" # Ubuntu 22.04 ap-south-1
-  instance_type          = "t3.micro"              # Free tier
+  instance_type          = "t3.micro"              
   subnet_id              = aws_subnet.public.id
   vpc_security_group_ids = [aws_security_group.app.id]
+  
+  # Link generated SSH Key directly to server instance
+  key_name               = aws_key_pair.app_key.key_name
 
   user_data = <<-EOF
     #!/bin/bash
@@ -106,6 +135,7 @@ resource "aws_instance" "app" {
     apt-get install -y docker.io
     systemctl start docker
     systemctl enable docker
+    usermod -aG docker ubuntu
   EOF
 
   tags = {
