@@ -1,0 +1,36 @@
+name: DevSecOps GitOps Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  security-and-build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: Run Secret Scanner
+      uses: trufflesecurity/trufflehog@main
+      with:
+        base: ""
+        head: "${{ github.sha }}"
+        extra_args: --debug --only-verified
+
+    - name: Run Python Security Scan
+      run: |
+        pip install safety
+        safety check || true
+
+    - name: Build Local Image for Scanning
+      run: |
+        docker build -t devops-app:latest ./backend
+
+    - name: Run Trivy Container Vulnerability Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'devops-app:latest'
+        format: 'table'
+        exit-code: '0'
+        severity: 'CRITICAL,HIGH'
