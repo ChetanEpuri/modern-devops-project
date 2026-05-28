@@ -7,7 +7,8 @@ app = Flask(__name__)
 def get_products():
     return jsonify([
         {"id": 1, "name": "Cloud Optimizer Pro", "price": 49.99},
-        {"id": 2, "name": "GitOps Automator", "price": 99.99}
+        {"id": 2, "name": "GitOps Automator", "price": 99.99},
+	{"id": 3, "name": "DevOps Master Kit", "price": 149.99}
     ])
 
 @app.route('/health', methods=['GET'])
