@@ -59,31 +59,20 @@ jobs:
           ${{ env.IMAGE_NAME }}:latest
           ${{ env.IMAGE_NAME }}:${{ github.sha }}
 
-  deploy:
+ deploy:
     runs-on: ubuntu-latest
     needs: build-and-push
     steps:
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@master
+    - name: Checkout Source Code
+      uses: actions/checkout@v4
       with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ubuntu
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          # Pull the latest image
-          docker pull ${{ env.IMAGE_NAME }}:latest
+        token: ${{ secrets.GITHUB_TOKEN }}
 
-          # Stop and remove the old container if running
-          docker stop devops-app || true
-          docker rm devops-app || true
-
-          # Run the new container
-          docker run -d \
-            --name devops-app \
-            --restart always \
-            -p 5000:5000 \
-            -e ENV=production \
-            ${{ env.IMAGE_NAME }}:latest
-
-          # Verify it's running
-          docker ps | grep devops-app
+    - name: Update Helm chart image tag
+      run: |
+        sed -i "s/tag: .*/tag: ${{ github.sha }}/" helm/devops-app/values.yaml
+        git config user.email "actions@github.com"
+        git config user.name "GitHub Actions"
+        git add helm/devops-app/values.yaml
+        git commit -m "chore: update image tag to ${{ github.sha }}"
+        git push

@@ -19,3 +19,11 @@ output "ec2_private_key" {
   value       = tls_private_key.rsa_key.private_key_pem
   sensitive   = true
 }
+
+output "eks_cluster_name" {
+  value = aws_eks_cluster.main.name
+}
+
+output "eks_cluster_endpoint" {
+  value = aws_eks_cluster.main.endpoint
+}

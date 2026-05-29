@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: devops-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ChetanEpuri/modern-devops-project
+    targetRevision: main
+    path: helm/devops-app
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true        # Delete resources removed from Git
+      selfHeal: true     # Auto-fix any manual changes to the cluster
+    syncOptions:
+    - CreateNamespace=true
