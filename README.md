@@ -28,56 +28,14 @@ The platform is built across **5 progressive phases**, each introducing industry
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        DEVELOPER WORKFLOW                           │
-│                                                                     │
-│   git push ──► GitHub Actions ──► Security Scans ──► Docker Build  │
-│                      │                                              │
-│                       ──► Push Image to DockerHub                   │
-│                      │                                              │
-│                       ──► Update Helm Chart tag in Git              │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                          GITOPS LAYER                               │
-│                                                                     │
-│   ArgoCD watches Git repo ──► Detects change ──► Syncs to cluster  │
-│                                     │                               │
-│                                      ──► Health check fails?        │
-│                                              │                      │
-│                                               ──► Auto rollback     │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                       AWS INFRASTRUCTURE                            │
-│                                                                     │
-│  ┌──────────────── VPC (10.0.0.0/16) ──────────────────────────┐   │
-│  │                                                              │   │
-│  │   Public Subnet              Private Subnet                  │   │
-│  │   ┌────────────────┐         ┌───────────────────┐          │   │
-│  │   │   EKS Cluster  │         │   RDS (Postgres)  │          │   │
-│  │   │   ┌──────────┐ │         └───────────────────┘          │   │
-│  │   │   │  Pod x2  │ │                                        │   │
-│  │   │   │  HPA 2-5 │ │         ┌───────────────────┐          │   │
-│  │   │   └──────────┘ │         │   S3 (TF State)   │          │   │
-│  │   └────────────────┘         └───────────────────┘          │   │
-│  └──────────────────────────────────────────────────────────────┘   │
-└──────────────────────────────┬──────────────────────────────────────┘
-                               │
-                               ▼
-┌─────────────────────────────────────────────────────────────────────┐
-│                    OBSERVABILITY STACK                              │
-│                                                                     │
-│   Pods ──► Prometheus (scrape /metrics) ──► Grafana (dashboards)   │
-│                    │                                                │
-│                     ──► AlertManager ──► Slack notifications        │
-└─────────────────────────────────────────────────────────────────────┘
-```
+### System overview
+![Architecture](docs/architecture-overview.png)
+
+
+### AWS infrastructure
+![AWS Infrastructure](docs/aws-infrastructure.png)
 
 ---
 
@@ -396,16 +354,8 @@ cd terraform && terraform destroy
 
 The pipeline runs automatically on every push to `main` and executes three sequential jobs:
 
-```
-┌─────────────────────┐     ┌─────────────────────┐     ┌──────────────────┐
-│   security-scan     │────►│  build-and-push      │────►│    deploy        │
-│                     │     │                      │     │                  │
-│ • TruffleHog        │     │ • docker/build-push  │     │ • Update Helm    │
-│ • Safety audit      │     │ • Tags: latest + SHA │     │   chart tag      │
-│ • Docker build      │     │ • Push to DockerHub  │     │ • Git commit     │
-│ • Trivy scan        │     │                      │     │ • ArgoCD detects │
-└─────────────────────┘     └─────────────────────┘     └──────────────────┘
-```
+![CI/CD Pipeline](docs/cicd-pipeline.png)
+
 
 ### GitHub Secrets required
 
