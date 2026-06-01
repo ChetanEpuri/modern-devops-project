@@ -1,0 +1,28 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: gitops-ecommerce-platform
+  title: GitOps E-Commerce Platform
+  description: Production-ready GitOps platform with CI/CD, Kubernetes, ArgoCD, and Prometheus monitoring
+  annotations:
+    github.com/project-slug: ChetanEpuri/modern-devops-project
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - kubernetes
+    - gitops
+    - devops
+    - python
+    - argocd
+    - prometheus
+  links:
+    - url: https://github.com/ChetanEpuri/modern-devops-project
+      title: GitHub Repository
+      icon: github
+    - url: https://github.com/ChetanEpuri/modern-devops-project/actions
+      title: CI/CD Pipeline
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: user:default/ChetanEpuri
+  system: devops-platform
