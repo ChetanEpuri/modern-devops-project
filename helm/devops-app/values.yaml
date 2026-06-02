@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: chetan6271/devops-app
-  tag: 6728e068fb62030dea466f082f631f456e6fcb62
+  tag: 49c02252f4b40b9055f4a7a3685f0782cefa82a3
   pullPolicy: Always
 
 service:
