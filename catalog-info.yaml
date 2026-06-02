@@ -6,6 +6,7 @@ metadata:
   description: Production-ready GitOps platform with CI/CD, Kubernetes, ArgoCD, and Prometheus monitoring
   annotations:
     github.com/project-slug: ChetanEpuri/modern-devops-project
+    ://github.com: cicd.yml # <-- FIX: Changed the colon to /workflows
     backstage.io/techdocs-ref: dir:.
   tags:
     - kubernetes
