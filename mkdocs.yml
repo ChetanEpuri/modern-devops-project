@@ -1,0 +1,9 @@
+﻿site_name: GitOps E-Commerce Platform
+site_description: Production-ready GitOps platform documentation
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Getting Started: getting-started.md
+  - Pipeline: pipeline.md
+plugins:
+  - techdocs-core

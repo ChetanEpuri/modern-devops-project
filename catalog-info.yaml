@@ -24,5 +24,5 @@ metadata:
 spec:
   type: service
   lifecycle: production
-  owner: user:default/guests
+  owner: group:default/guests
   system: devops-platform
